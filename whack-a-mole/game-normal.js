@@ -1,8 +1,5 @@
 window.onload = function () {
-
-    const holes = document.querySelectorAll('.hole');
     const scoreBoard = document.querySelector('.score');
-    const moles = document.querySelectorAll('.mole');
     const startBtn = document.getElementById('start_btn');
     let titleH1 = document.getElementById('title');
 
@@ -13,24 +10,70 @@ window.onload = function () {
 
 
     startBtn.addEventListener('click', function () {
-        showBtnAnimation();
-        startGame();
+      timeUp = false;
+      score = 0;
+      scoreBoard.innerHTML = score;
+      showBtnAnimation();
+      titleH1.innerHTML = 'WHACK-A-MOLE!';
+      startGame();
     }, false);
 
     function showBtnAnimation() {
         event.preventDefault();
 
         startBtn.classList.add('animate');
-        // 按钮动画延时，按钮动画结束后发生的事：换为正常状态（class中的animate去掉），开始按钮消失
         setTimeout(() => {
             startBtn.classList.remove('animate');
             startBtn.style.display = 'none';
         }, 700);
     }
 
-
-    function startGame() {
-        // TODO: 写开始新游戏后发生的事
+    function rand(max, min) {
+      return Math.random() * (max - min + 1) + min;
     }
 
+    function showUp() {
+      if (!timeUp) {
+        lastHole = Math.floor(rand(6, 1));
+        let showDuration = rand (200, 100);
+        var whichHole = document.getElementsByClassName('hole' + lastHole);
+        var upmole = whichHole.item(0).firstElementChild;
+        whichHole.item(0).classList.add('up');
+        upmole.addEventListener('click', scoreCal, {once: true});
+        return setTimeout(showDown, showDuration + 400);
+      }
+    }
+
+    function showDown() {
+      console.log(1);
+      var whichHole = document.getElementsByClassName('hole' + lastHole);
+      whichHole.item(0).classList.remove('up');
+      
+      if (!timeUp) {
+        return setTimeout(showUp, 400);
+      }
+    }
+
+    function timeOver(time) { 
+      var remainTime = setInterval(function() {
+        time = time - 1000;
+        if (time === 0) {
+          clearInterval(remainTime);
+          startBtn.style.display = 'inline-block';
+          startBtn.innerHTML = 'Replay';
+          titleH1.innerHTML = 'TIME UP!';
+          return timeUp = true;
+        }
+      }, 1000);
+    }
+
+    function scoreCal() {
+        score = score+ 1;
+        scoreBoard.innerHTML = score;
+      }
+
+    function startGame() {
+      timeOver(gameTime);
+      showUp();
+    }
 };
